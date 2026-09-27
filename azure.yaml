@@ -1,0 +1,3 @@
+# Informational project metadata. Use the documented Azure CLI resource-group
+# deployment and GitHub workflow; azd up is not configured for this prototype.
+name: agentic-retail-operations

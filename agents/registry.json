@@ -1,0 +1,94 @@
+{
+  "authorization": "Not implemented; Microsoft Entra ID is a production requirement",
+  "orchestrator": "retail-orchestrator",
+  "agents": [
+    {
+      "id": "demand-signal",
+      "skills": [
+        "demand-sensing",
+        "forecasting",
+        "anomaly-detection"
+      ],
+      "modelPolicy": "forecast",
+      "output": "demand-event",
+      "taskClasses": [
+        "forecast",
+        "time-series",
+        "anomaly"
+      ]
+    },
+    {
+      "id": "inventory",
+      "skills": [
+        "availability-graph",
+        "substitution",
+        "inventory-position"
+      ],
+      "modelPolicy": "fast-grounded",
+      "output": "inventory-graph",
+      "taskClasses": [
+        "retrieve",
+        "ground",
+        "inventory-query"
+      ]
+    },
+    {
+      "id": "allocation",
+      "skills": [
+        "scenario-simulation",
+        "rebalancing",
+        "fulfillment-optimization"
+      ],
+      "modelPolicy": "reasoning",
+      "output": "allocation-options",
+      "taskClasses": [
+        "simulate",
+        "optimize",
+        "design",
+        "resolve-ambiguity"
+      ]
+    },
+    {
+      "id": "risk-governance",
+      "skills": [
+        "authority-review",
+        "constraint-challenge",
+        "control-design"
+      ],
+      "modelPolicy": "independent-judge",
+      "output": "risk-opinion",
+      "taskClasses": [
+        "challenge",
+        "risk-review",
+        "evaluate"
+      ]
+    },
+    {
+      "id": "value",
+      "skills": [
+        "margin-modeling",
+        "service-impact",
+        "sensitivity-analysis"
+      ],
+      "modelPolicy": "deterministic",
+      "output": "value-case",
+      "taskClasses": [
+        "calculate"
+      ]
+    },
+    {
+      "id": "execution",
+      "skills": [
+        "transfer-order",
+        "promise-update",
+        "supplier-action"
+      ],
+      "modelPolicy": "policy-bound-tools",
+      "output": "execution-receipts",
+      "taskClasses": [
+        "enforce-policy"
+      ]
+    }
+  ],
+  "contractVersion": "retail-task/1"
+}

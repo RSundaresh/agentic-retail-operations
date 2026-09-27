@@ -1,0 +1,12 @@
+{
+  "strategy":"right-model-right-task", "default":"model-router",
+  "policies":[
+    {"taskClass":"forecast|time-series|anomaly","route":"forecast-model","explanationRequired":true},
+    {"taskClass":"extract|classify|summarize","route":"fast-model","maxLatencyMs":2500,"qualityFloor":0.85},
+    {"taskClass":"retrieve|ground|inventory-query","route":"fast-model","tools":["foundry-iq","fabric"],"citationsRequired":true},
+    {"taskClass":"simulate|optimize|design|resolve-ambiguity","route":"reasoning-model","qualityFloor":0.90},
+    {"taskClass":"challenge|risk-review|evaluate","route":"independent-reasoning-model","separateFromProducer":true},
+    {"taskClass":"calculate|authorize|execute|enforce-policy","route":"deterministic-code","modelMayNotOverride":true}
+  ],
+  "budgets":{"maximumCostPerCompletedCaseUsd":2.5,"maximumAgentHops":12,"maximumRetriesPerTask":2}
+}

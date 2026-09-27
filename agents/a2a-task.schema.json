@@ -1,0 +1,158 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Local Retail Task Proposal (not an A2A wire Task)",
+  "type": "object",
+  "required": [
+    "taskId",
+    "contextId",
+    "fromAgent",
+    "toAgent",
+    "intent",
+    "authority",
+    "evidence",
+    "constraints",
+    "requiresHumanApproval",
+    "trace",
+    "contractVersion",
+    "modelRoute"
+  ],
+  "properties": {
+    "taskId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 4096,
+      "pattern": "\\S"
+    },
+    "contextId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 4096,
+      "pattern": "\\S"
+    },
+    "fromAgent": {
+      "const": "retail-orchestrator"
+    },
+    "toAgent": {
+      "enum": [
+        "demand-signal",
+        "inventory",
+        "allocation",
+        "risk-governance",
+        "value",
+        "execution"
+      ]
+    },
+    "intent": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 4096,
+      "pattern": "\\S"
+    },
+    "authority": {
+      "enum": [
+        "analyze",
+        "recommend",
+        "prepare-action"
+      ]
+    },
+    "evidence": {
+      "type": "array",
+      "maxItems": 100,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "source",
+          "version"
+        ],
+        "properties": {
+          "source": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4096,
+            "pattern": "\\S"
+          },
+          "version": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4096,
+            "pattern": "\\S"
+          }
+        }
+      }
+    },
+    "constraints": {
+      "type": "array",
+      "maxItems": 100,
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 4096,
+        "pattern": "\\S"
+      }
+    },
+    "requiresHumanApproval": {
+      "const": true
+    },
+    "trace": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "createdAt",
+        "hop"
+      ],
+      "properties": {
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "hop": {
+          "const": 1
+        }
+      }
+    },
+    "contractVersion": {
+      "const": "retail-task/1"
+    },
+    "modelRoute": {
+      "enum": [
+        {
+          "taskClass": "forecast|time-series|anomaly",
+          "route": "forecast-model",
+          "explanationRequired": true
+        },
+        {
+          "taskClass": "extract|classify|summarize",
+          "route": "fast-model",
+          "maxLatencyMs": 2500,
+          "qualityFloor": 0.85
+        },
+        {
+          "taskClass": "retrieve|ground|inventory-query",
+          "route": "fast-model",
+          "tools": [
+            "foundry-iq",
+            "fabric"
+          ],
+          "citationsRequired": true
+        },
+        {
+          "taskClass": "simulate|optimize|design|resolve-ambiguity",
+          "route": "reasoning-model",
+          "qualityFloor": 0.9
+        },
+        {
+          "taskClass": "challenge|risk-review|evaluate",
+          "route": "independent-reasoning-model",
+          "separateFromProducer": true
+        },
+        {
+          "taskClass": "calculate|authorize|execute|enforce-policy",
+          "route": "deterministic-code",
+          "modelMayNotOverride": true
+        }
+      ]
+    }
+  },
+  "additionalProperties": false
+}

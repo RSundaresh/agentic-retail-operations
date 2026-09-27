@@ -1,0 +1,10 @@
+const fs = require('fs');
+const assert = require('assert');
+const required = ['index.html','styles.css','app.js','data.js','staticwebapp.config.json'];
+required.forEach(file => assert(fs.existsSync(file), `Missing ${file}`));
+const html=fs.readFileSync('index.html','utf8');
+const js=fs.readFileSync('app.js','utf8');
+assert(html.includes('Agentic Retail Operations'), 'Brand missing');
+assert(html.includes('Run simulation'), 'Simulation CTA missing');
+assert(js.includes('renderTab'), 'Blueprint tabs missing');
+console.log(`✓ Agentic Retail Operations smoke test passed (${required.length} artifacts verified)`);
