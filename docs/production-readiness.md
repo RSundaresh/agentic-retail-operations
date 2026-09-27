@@ -1,40 +1,19 @@
 # Production readiness
 
-> Scope: this document describes the proposed production system. The current application is a public, offline demo with static fixtures; identity, retrieval, agent invocation, execution, approval verification, and telemetry are not implemented.
+The repository implements a deployable, bounded multi-agent **demo**, not a production retail transaction platform.
 
-## Pilot entry criteria
+Implemented: real dependency-aware orchestration, parallel fan-out/fan-in, environment-routed models, explicit managed identity, deterministic offline provider, structured output validation, correlated traces, bounded retries/timeouts, API-connected UI, Azure role/owner checks, expiring human approval, ETag concurrency, shared daily admission limit, Blob persistence, Insights logging, Bicep and tests.
 
-- Executive sponsor and accountable process owner identified
-- Current-state telemetry and baseline agreed
-- User population and business outcome defined
-- Data classifications and residency constraints recorded
-- Agent authority and human approval boundaries approved
-- Evaluation set represents common, ambiguous, and adversarial cases
-- Integration owners and rollback paths confirmed
+Release prerequisites still requiring a network-enabled Azure environment:
 
-## Technical readiness
+- Install pinned SDKs, generate/review a transitive lockfile, run dependency audit, and run the Functions v4 host. Mock unit/integration tests intentionally do not need SDK installation.
+- Compile Bicep; review what-if, provider registration, region capacity, subscription permissions and budget support. No deployment has been validated in Azure from this workspace.
+- Configure Entra registration/scope/role assignment and obtain a correct delegated token. Verify unauthenticated, wrong-role, wrong-tenant, wrong-audience and forged-header rejection at the hosted boundary.
+- Validate managed identity Blob access, deployment-container access, OpenAI User RBAC propagation, model availability and supported JSON/token parameters. Confirm real model schemas and failure behavior; test quotas and cost assumptions.
+- Verify traces in Application Insights, Blob persistence across restarts, ETag contention across instances, retention and actual budget notification delivery.
 
-- [ ] Threat model reviewed
-- [ ] Workload and user identities separated
-- [ ] Tools enforce least privilege independently of prompts
-- [ ] Secrets stored in Key Vault
-- [ ] Retrieval honors source permissions
-- [ ] Model, prompt, policy, and workflow versions recorded
-- [ ] Idempotency and compensating actions tested
-- [ ] End-to-end traces contain no prohibited data
-- [ ] Offline and online evaluations meet thresholds
-- [ ] Latency, availability, and unit-cost budgets established
+Before any real system-of-record action: add scoped tool adapters, independently verified business evidence, policy versioning, operation-specific permissions, separation of duties where needed, idempotency keys honored by the target system, transactional outbox/reconciliation and compensation. Do not replace the demo receipt function with an external write and assume the current crash semantics are sufficient.
 
-## Operational readiness
+For a production pilot: use MSAL user sign-in, workload-specific identities, private networking where justified, tamper-evident approval audit, user/team access model, tenant isolation, queue-backed durable orchestration, resumable workflow stages, cancellation, circuit breakers, rate enforcement on all routes, formal model evaluations and prompt-injection tests. Measure recommendation quality, fairness of allocations and real business value; dashboard numbers are not benchmark results.
 
-- [ ] Named service owner and incident path
-- [ ] Dashboards for workflow, model, tool, security, and value metrics
-- [ ] Alert thresholds and runbooks exercised
-- [ ] Human fallback available during agent failure
-- [ ] Change approval and rollback tested
-- [ ] User training and feedback mechanism complete
-- [ ] Weekly pilot review and value-realization cadence scheduled
-
-## Pilot exit criteria
-
-The pilot advances only if it improves the agreed business outcome, maintains control compliance, meets evaluation and reliability thresholds, stays within unit economics, and demonstrates sustained adoption. A technically functional agent without measurable process improvement does not pass.
+Known demo limits: local state is volatile; approved runs cannot be rolled back; hosting interruption can leave `running` or `executing` runs; trace snapshots save at stage completion rather than every event; initial response loss has no client idempotency/recovery key; traces are fetched after completion rather than streamed. Model rationale is unverified. Different risk deployment names do not guarantee epistemic independence. Resource-group budgets are alerts, not spend enforcement. Internal envelopes are not official A2A, and no A2A conformance testing has been performed.

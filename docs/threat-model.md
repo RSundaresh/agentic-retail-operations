@@ -1,29 +1,23 @@
 # Threat model
 
-> Scope: this document describes the proposed production system. The current application is a public, offline demo with static fixtures; identity, retrieval, agent invocation, execution, approval verification, and telemetry are not implemented.
+Assets: delegated user tokens, run proposals, approvals, correlation traces, model budget, workload identity and deployment package. Boundaries: browser → Easy Auth → Functions → Blob/Azure models. Retail data is synthetic; do not enter customer or production information.
 
-## Protected assets
+| Threat | Implemented control | Residual risk / validation |
+| --- | --- | --- |
+| Forged approver or principal header | Azure Easy Auth tenant/audience validation plus AAD object ID, delegated scope and Retail.Demo role checks | Principal-header trust depends on deployed Easy Auth configuration; test forged headers against Azure before release |
+| Unauthorized run access | Read/approval restricted to owner; 404 hides other users' runs | No team delegation or separation of requester and approver; same assigned user may approve |
+| Duplicate/replayed approval | ETag claim before execution, exact revision, pending-only, expiry | Crash after claim needs investigation; no automatic execution recovery |
+| Model authorizes itself | Models have no tools; runtime policy and human gate are deterministic | A mistaken human can approve a poor recommendation; outputs are not independently verified facts |
+| Prompt injection | Only enumerated scenarios accepted; numeric evidence passed between agents; exact output schema/limits | LLMs can still make bad or inconsistent decisions; separate risk deployment is not proof of independence |
+| Unsafe generated HTML | Model output and trace use textContent; CSP self-only scripts | Checked-in dashboard fixtures still use HTML templates and must remain trusted |
+| CSRF/cross-origin approval | JSON-only POST, same-origin check, no CORS, bearer-token authentication | A same-origin XSS could act as user; CSP and dependency review matter |
+| Credential theft | ManagedIdentityCredential for Azure; no source keys; browser token not persisted or logged | Operator token entry and browser extensions remain risks; replace with MSAL for pilot |
+| SSRF/config tampering | Fixed HTTPS Azure host suffixes, v1 path; no user-supplied model/endpoint | Trusted deployer can alter configuration/code; restrict deployment permissions |
+| Cost abuse | Role-limited callers, atomic shared daily cap, 600 completion tokens, 4 KB prompt limit, two attempts, budget alerts | Authentication failures and reads/static traffic still cost money; budget is not a hard stop |
+| Retry storm or dependency outage | Eight-second deadlines, bounded retries, fail-closed state | Azure may finish timed-out requests; no circuit breaker or Retry-After coordination |
+| Data leakage in logs | Trace contains task metadata/error codes, not tokens or raw provider errors | Blob contains model text and owner IDs; seven-day deletion, RBAC, encryption required |
+| State races and loss | Azure Blob ETags, durable proposal/approval records | Operator/admin can mutate/delete records; this is not tamper-evident audit storage |
+| Local identity bypass | Explicit simulated approver; local dev binds 127.0.0.1, checks Host, mock-only | Local users/processes can approve; never expose dev server to a network |
+| Supply chain compromise | Direct dependency pins; validation-only CI; no postinstall needed | Transitive lock generation/audit and immutable action pins remain release requirements |
 
-- Enterprise process and policy knowledge
-- Customer and transaction data
-- Agent instructions and tool credentials
-- Decisions, evidence, and approval records
-- Downstream systems of record
-- Transformation-value and operational telemetry
-
-## Principal threats and controls
-
-| Threat | Example | Primary controls |
-|---|---|---|
-| Prompt injection | Uploaded document attempts to override agent policy | Content isolation, instruction hierarchy, tool allowlists, input classification |
-| Excessive agency | Agent posts a financial adjustment above its authority | Identity-bound tools, transaction limits, approval gates, short-lived credentials |
-| Data leakage | Sensitive evidence appears in an unauthorized response | Entra authorization, Purview labels, retrieval filtering, output inspection |
-| Unsupported decision | Recommendation cannot be traced to policy | Required citations, confidence threshold, fail-closed escalation |
-| Automation bias | Human approves without inspecting evidence | Approval UX, counter-evidence, randomized review, override capture |
-| Replay or duplicate action | Workflow retry creates a second account or payment | Idempotency keys, operation ledger, compensating transaction |
-| Model or policy drift | Outcomes change after model or policy update | Version pinning, regression evaluation, canary deployment, rollback |
-| Cost exhaustion | Public requests create unbounded model consumption | Authentication, quotas, token budgets, caching, anomaly alerts |
-
-## Trust boundary principle
-
-Model output is untrusted until validated by deterministic policy and the relevant authority boundary. Reasoning may propose an action; identity, policy, and workflow state determine whether the action is allowed.
+Security/failure tests exercise role parsing, missing identity, ownership, concurrency, revision replay, expiry, CSRF, malformed JSON, oversized requests, unknown fields, endpoint restrictions, policy rejection, model outages and timeouts. They do not replace Azure penetration tests or live authentication/RBAC verification.

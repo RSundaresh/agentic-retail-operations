@@ -1,6 +1,6 @@
 # Reference benchmark
 
-> Scope: this document describes the proposed production system. The current application is a public, offline demo with static fixtures; identity, retrieval, agent invocation, execution, approval verification, and telemetry are not implemented.
+> Scope: historical design comparison, not a verification of the reference platform. The implemented runtime and its remaining limitations are described in architecture.md and production-readiness.md.
 
 The AWS Wealth Management and Advisor Demo Platform is the architectural quality bar for this project. It demonstrates a mature domain platform with multiple APIs, eight agents, A2A collaboration, MCP gateways, graph and analytical data, voice, event-driven workflows, governance, observability, and infrastructure as code.
 

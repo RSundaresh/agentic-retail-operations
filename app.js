@@ -4,6 +4,7 @@ let selectedModel = "balanced";
 let simulationTimer;
 function closeSimulation(){
   clearTimeout(simulationTimer);
+  requestGeneration++;
   $("#simulation-modal").classList.remove("open");
   $("#simulation-modal").setAttribute("aria-hidden", "true");
 }
@@ -76,27 +77,77 @@ function openDrawer(){
 }
 function closeDrawer(){ $("#drawer").setAttribute("aria-hidden", "true");$("#drawer").classList.remove('open');$("#overlay").classList.remove('open') }
 
-function runSimulation(){
+let activeRun;
+let requestGeneration = 0;
+async function api(path, body) {
+  const token = $('#api-token').value?.trim();
+  const response = await fetch(path, {
+    method: body ? 'POST' : 'GET',
+    headers: {'Content-Type':'application/json', ...(token ? {Authorization:`Bearer ${token}`} : {})},
+    ...(body ? {body:JSON.stringify(body)} : {})
+  });
+  const result = await response.json();
+  if (!response.ok) throw new Error(result.error || `HTTP ${response.status}`);
+  return result;
+}
+function showRun(run) {
+  activeRun = run;
+  $('#sim-title').textContent = `${run.scenario} · ${run.mode.toUpperCase()} models`;
+  $('#sim-event').textContent = `Approval state: ${run.state} · Correlation: ${run.id} · Expires: ${run.expiresAt}${run.error ? ` · ${run.error}` : ''}${run.approval ? ` · ${run.approval.decision} by ${run.approval.actor} at ${run.approval.at}` : ''}`;
+  $('#sim-track').textContent = run.trace.filter(t => t.event === 'succeeded').map(t => `${t.agent} → ${t.model} (${t.latencyMs} ms)`).join(' | ');
+  $('#sim-results').textContent = JSON.stringify(run.outputs, null, 2);
+  $('#live-trace').textContent = JSON.stringify(run.trace, null, 2);
+  $('#approve-run').disabled = run.state !== 'pending';
+  $('#reject-run').disabled = run.state !== 'pending';
+  $('#refresh-run').disabled = false;
+}
+async function runSimulation(){
   closeSimulation();
-  const scenario=current;
-  const model=D[scenario].models.find(m=>m.id===selectedModel);
-  const events=D[scenario].simulation;
-  $("#sim-event").textContent="Preparing illustrative simulation…";
-  $("#simulation-modal").setAttribute("aria-hidden", "false");
-  $("#sim-title").textContent=current==='inventory'?'Resolving inventory disruption EVT-2048':'Optimizing promotion event PRM-8821';
-  $("#sim-track").innerHTML=events.map((e,i)=>`<div class="sim-node" data-i="${i}"><div class="sim-icon">${e[2]==='human'?'HU':e[2]==='system'?'SY':'AI'}</div><small>${e[0]}</small></div>`).join('');
-  $("#sim-results").innerHTML=''; $("#simulation-modal").classList.add('open');
-  let i=0; const advance=()=>{
-    if(i>0) $(`.sim-node[data-i="${i-1}"]`).classList.replace('active','done');
-    if(i<events.length){ const e=events[i]; $(`.sim-node[data-i="${i}"]`).classList.add('active'); $("#sim-event").innerHTML=`<strong>${e[0]}</strong> · ${e[1]}<br><small>${e[4]} · routed to <b>${e[3]}</b></small>`; i++; simulationTimer=setTimeout(advance,850); }
-    else { $("#sim-event").innerHTML='<strong>Simulation complete</strong> · Illustrative walkthrough only; no actions executed.'; $("#sim-results").innerHTML=`<div class="sim-result"><small>Resolution time</small><strong>${model.cycle}</strong></div><div class="sim-result"><small>Planned human effort</small><strong>${model.effort}</strong></div><div class="sim-result"><small>Projected margin protected</small><strong>${scenario==='inventory'?'$184K':'$231K'}</strong></div>`; }
-  }; simulationTimer=setTimeout(advance,400);
+  const generation = ++requestGeneration;
+  activeRun = null;
+  $('#simulation-modal').classList.add('open');
+  $('#simulation-modal').setAttribute('aria-hidden', 'false');
+  $('#sim-title').textContent = 'Running agent workflow…';
+  $('#sim-event').textContent = 'Demand and inventory fan-out → allocation → risk and value fan-out → human approval';
+  $('#sim-track').textContent = '';
+  $('#sim-results').textContent = '';
+  $('#live-trace').textContent = '';
+  $('#approve-run').disabled = true;
+  $('#reject-run').disabled = true;
+  $('#refresh-run').disabled = true;
+  $('#simulate-btn').disabled = true;
+  try {
+    const settings = await api('/api/config');
+    $('#runtime-mode').textContent = `${settings.mode.toUpperCase()} models · ${settings.identity} · demo receipts only`;
+    const run = await api('/api/runs', {scenario:current});
+    if (generation === requestGeneration) showRun(run);
+  } catch(e) {
+    if (generation === requestGeneration) $('#sim-event').textContent = `API error: ${e.message}. No simulated fallback. Reconnect before starting another run.`;
+  } finally { $('#simulate-btn').disabled = false; }
+}
+async function decideRun(decision) {
+  if (!activeRun || activeRun.state !== 'pending') return;
+  const run = activeRun, generation = requestGeneration;
+  $('#approve-run').disabled = true; $('#reject-run').disabled = true;
+  try {
+    const result = await api(`/api/runs/${run.id}/approval`, {decision,revision:run.revision});
+    if (generation === requestGeneration) showRun(result);
+  } catch(e) { if(generation===requestGeneration)$('#sim-event').textContent = `Approval error: ${e.message}. Refresh state before retrying.`; }
+}
+async function refreshRun() {
+  if (!activeRun) return;
+  const generation=requestGeneration, id=activeRun.id;
+  try {const result=await api(`/api/runs/${id}`);if(generation===requestGeneration)showRun(result);}
+  catch(e) {if(generation===requestGeneration)$('#sim-event').textContent = `Refresh error: ${e.message}`;}
 }
 function toast(msg){const t=document.createElement('div');t.className='toast';t.textContent=msg;document.body.appendChild(t);setTimeout(()=>t.remove(),3100)}
 
 $$('.scenario').forEach(s=>s.onclick=()=>{closeSimulation();current=s.dataset.scenario;selectedModel='balanced';$$('.scenario').forEach(x=>x.classList.toggle('active',x===s));render()});
 $$('.tab').forEach(t=>t.onclick=()=>renderTab(t.dataset.tab));
 $('#evidence-btn').onclick=openDrawer;$('#inspect-btn').onclick=openDrawer;$('#close-drawer').onclick=closeDrawer;$('#overlay').onclick=closeDrawer;
+$('#approve-run').onclick=()=>decideRun('approve');
+$('#reject-run').onclick=()=>decideRun('reject');
+$('#refresh-run').onclick=refreshRun;
 $('#simulate-btn').onclick=runSimulation;$('#close-simulation').onclick=closeSimulation;
 $('#export-btn').onclick=()=>toast('Architecture export is planned; no package was generated');
 $$('.nav-item').forEach(n=>n.onclick=()=>toast(`${n.textContent.trim()} · Included in the enterprise roadmap`));
