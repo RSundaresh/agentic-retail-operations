@@ -4,11 +4,11 @@
   "private": true,
   "description": "Agentic retail operations control tower for demand sensing, inventory rebalancing, and omnichannel fulfillment.",
   "scripts": {
-    "start": "npm run build && python3 -m http.server 4173 --bind 127.0.0.1 --directory dist",
+    "start": "npm run build && node scripts/dev.js",
     "build": "node scripts/build.js",
-    "test": "node --test tests/*.test.js"
+    "test": "node --test tests/*.test.js api/test/*.test.js"
   },
   "engines": {
-    "node": ">=20"
+    "node": ">=22"
   }
 }

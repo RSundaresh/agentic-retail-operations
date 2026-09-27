@@ -8,3 +8,7 @@ for (const file of ['index.html', 'styles.css', 'app.js', 'data.js', 'staticweba
   fs.copyFileSync(path.join(root, file), path.join(output, file));
 }
 console.log('Built five public assets in dist/');
+
+const apiPublic = path.join(root, 'api/public');
+fs.rmSync(apiPublic, {recursive:true, force:true});
+fs.cpSync(output, apiPublic, {recursive:true});

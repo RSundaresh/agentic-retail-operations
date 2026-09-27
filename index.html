@@ -22,7 +22,7 @@
         <button class="scenario" data-scenario="promotion"><span class="scenario-icon cyan">PE</span><div>Promotion event<small>Merchandising</small></div></button>
       </div>
       <div class="sidebar-footer">
-        <div class="status"><i></i> Offline illustrative prototype</div>
+        <div class="status"><i></i> <span id="runtime-mode">API mode unknown · connect by running workflow</span></div>
         <button class="avatar">SI</button><div><strong>Sundar Iyer</strong><small>Transformation Architect</small></div>
       </div>
     </aside>
@@ -30,9 +30,10 @@
     <main>
       <header>
         <div><span class="eyebrow">AGENTIC RETAIL OPERATIONS CONTROL TOWER</span><h1 id="page-title">Inventory disruption</h1><p id="page-subtitle">Sense demand, rebalance inventory, and govern execution across every channel.</p></div>
-        <div class="header-actions"><button class="ghost" id="evidence-btn">Evidence <span class="badge">6</span></button><button class="primary" id="simulate-btn"><span>▶</span> Run simulation</button></div>
+        <div class="header-actions"><button class="ghost" id="evidence-btn">Evidence <span class="badge">6</span></button><button class="primary" id="simulate-btn"><span>▶</span> Run agent workflow</button></div>
       </header>
 
+      <section class="connection panel"><label for="api-token">Azure access token (deployed demo only; kept in this page’s memory)</label><input id="api-token" type="password" autocomplete="off" placeholder="Local mock needs no credentials" /><p>All dashboard forecasts and business metrics below are illustrative. Workflow results appear when you run the agents.</p></section>
       <section class="summary-grid" id="summary-grid"></section>
 
       <section class="panel process-panel">
@@ -42,10 +43,10 @@
       </section>
 
       <section class="panel orchestration-panel">
-        <div class="panel-heading"><div><span class="kicker">MULTI-AGENT ORCHESTRATION</span><h2>Proposed specialist collaboration</h2></div><div class="protocol-pill">Local demo · A2A / Entra planned</div></div>
+        <div class="panel-heading"><div><span class="kicker">MULTI-AGENT ORCHESTRATION</span><h2>Specialist collaboration</h2></div><div class="protocol-pill">Internal retail-task/2 · not official A2A</div></div>
         <div class="orchestration-map">
           <article class="agent-node orchestrator"><span>OR</span><div><strong>Retail Orchestrator</strong><small>Plans, delegates, reconciles</small><em>Model Router</em></div></article>
-          <div class="a2a-line"><i></i><b>A2A</b></div>
+          <div class="a2a-line"><i></i><b>TASKS</b></div>
           <div class="agent-grid">
             <article class="agent-node"><span>DS</span><div><strong>Demand Signal</strong><small>Detects demand shifts</small><em>Forecast models</em></div></article>
             <article class="agent-node"><span>IN</span><div><strong>Inventory</strong><small>Builds availability graph</small><em>Fast model + tools</em></div></article>
@@ -58,7 +59,7 @@
         </div>
       </section>
 
-      <section class="section-heading"><div><span class="kicker">TARGET OPERATING MODELS</span><h2>Choose the boundary between people and agents</h2></div><div class="confidence">Analysis confidence <strong>91%</strong></div></section>
+      <section class="section-heading"><div><span class="kicker">TARGET OPERATING MODELS</span><h2>Compare illustrative operating models</h2></div><div class="confidence">Illustrative comparison · API routing is server-configured</div></section>
       <section class="models" id="models"></section>
 
       <section class="blueprint panel" id="blueprint">
@@ -82,12 +83,14 @@
 
   <div class="simulation-modal" id="simulation-modal" aria-hidden="true">
     <div class="simulation-card">
-      <div class="simulation-head"><div><span class="live-dot"></span>ILLUSTRATIVE OPERATING-MODEL SIMULATION</div><button id="close-simulation">×</button></div>
+      <div class="simulation-head"><div><span class="live-dot"></span>AGENT WORKFLOW & HUMAN APPROVAL</div><button id="close-simulation">×</button></div>
       <h2 id="sim-title">Resolving inventory disruption EVT-2048</h2>
-      <p>Scripted walkthrough with sample data. No agents, approvals, or enterprise actions run.</p>
+      <p>Synthetic retail evidence in both modes. Live means Azure model calls; execution creates a demo receipt only. Dashboard business metrics are illustrative.</p>
       <div class="sim-track" id="sim-track"></div>
       <div class="sim-event" id="sim-event"><span>Preparing simulation…</span></div>
-      <div class="sim-results" id="sim-results"></div>
+      <pre class="sim-results" id="sim-results"></pre>
+      <div class="approval-actions"><button id="approve-run" disabled>Approve demo transfer</button><button id="reject-run" disabled>Reject</button><button id="refresh-run" disabled>Refresh state</button></div>
+      <details><summary>Agent trace (routing, attempts, latency)</summary><pre id="live-trace"></pre></details>
     </div>
   </div>
   <script src="data.js"></script>

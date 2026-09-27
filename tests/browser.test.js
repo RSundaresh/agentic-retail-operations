@@ -12,15 +12,29 @@ function browser() {
   for (const file of ['data.js','app.js']) vm.runInContext(fs.readFileSync(file,'utf8'),context);
   return {element,timers,run:s=>vm.runInContext(s,context),finish(){while(timers.size){const [key,fn]=timers.entries().next().value;timers.delete(key);fn();}}};
 }
-test('initial blueprint and selected scenario/model results agree',()=>{
-  const b=browser(); assert.equal(b.element('#blueprint-title').textContent,'Agent-led rebalancing');
-  b.run("current='promotion';selectedModel='assist';render();runSimulation()"); b.finish();
-  assert.match(b.element('#sim-results').innerHTML,/2.4 days/); assert.match(b.element('#sim-results').innerHTML,/16 actions/);
+test('frontend calls API and renders approval, routing, latency and safe model text',async()=>{
+  const b=browser();
+  assert.equal(b.element('#blueprint-title').textContent,'Agent-led rebalancing');
+  b.run(`fetch = async (url, options) => ({ok:true,json:async()=>url==='/api/config' ? {mode:'simulated',identity:'local'} : {id:'run-1',scenario:'inventory',state:'pending',mode:'simulated',expiresAt:'soon',revision:1,outputs:{demand:{rationale:'<script>bad</script>'}},trace:[{event:'succeeded',agent:'demand',model:'mock-demand-v1',latencyMs:2}]}})`);
+  await b.run('runSimulation()');
+  assert.match(b.element('#sim-event').textContent,/pending/);
+  assert.match(b.element('#sim-track').textContent,/mock-demand-v1.*2 ms/);
+  assert.equal(b.element('#approve-run').disabled,false);
+  assert.match(b.element('#sim-results').textContent,/<script>/);
+  assert.equal(b.element('#sim-results').innerHTML,'');
 });
-test('closing or restarting cancels pending simulation callbacks',()=>{
-  const b=browser(); b.run('runSimulation();runSimulation()'); assert.equal(b.timers.size,1);
-  b.run('closeSimulation()'); assert.equal(b.timers.size,0); assert.equal(b.element('#simulation-modal')['aria-hidden'],'true');
-  b.run('runSimulation()'); b.finish(); assert.equal(b.timers.size,0); assert.match(b.element('#sim-event').innerHTML,/no actions executed/);
+test('API errors remain visible without fabricated results',async()=>{
+  const b=browser();b.run("fetch=async()=>{throw new Error('offline')}");
+  await b.run('runSimulation()');
+  assert.match(b.element('#sim-event').textContent,/offline/);
+  assert.equal(b.element('#approve-run').disabled,true);
+});
+test('closing prevents stale asynchronous responses from updating the run',async()=>{
+  const b=browser();b.run("let release;fetch=()=>new Promise(resolve=>{release=()=>resolve({ok:true,json:async()=>({mode:'simulated'})})})");
+  const pending=b.run('runSimulation()');b.run('closeSimulation();release()');
+  await new Promise(r=>setImmediate(r));b.run('release()');await pending;
+  assert.equal(b.element('#simulation-modal')['aria-hidden'],'true');
+  assert.equal(b.element('#approve-run').disabled,true);
 });
 test('drawer accessibility state follows visibility',()=>{
   const b=browser(); b.run('openDrawer()'); assert.equal(b.element('#drawer')['aria-hidden'],'false');
