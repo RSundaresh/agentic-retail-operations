@@ -91,6 +91,9 @@ Validate unauthenticated API requests return 401, wrong-role requests return 403
 `npm test` runs unit, API integration, frontend VM, security, concurrency and failure-path tests without Azure or third-party packages. `npm run build` builds both hosting artifacts. CI also installs the Azure SDKs and compiles Bicep; it has no deploy job.
 
 - [Architecture](docs/architecture.md)
+- [Requirements and constraints traceability](docs/requirements-traceability.md)
+- [Architecture decision log](docs/decision-log.md)
+- [Delivery roadmap, pilot governance and value realization](docs/delivery-roadmap.md)
 - [Threat model](docs/threat-model.md)
 - [Cost guidance](docs/cost-guidance.md)
 - [Production readiness and remaining limitations](docs/production-readiness.md)

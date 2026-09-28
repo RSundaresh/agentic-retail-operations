@@ -100,34 +100,37 @@ Legacy simulated scenario narrative (not actual execution):
 - Merchandising lead · Regional pricing exception approved · human · deterministic-policy · Approval gate satisfied.
 - Execution Agent · Offer launched with continuous demand adaptation · agent · policy-bound-tools · Workflow completed.
 
-## Proposed blueprint and decision record
+## Proposed enterprise context and data flows
 
-The Operations UI links here for technical detail. Server-configured routing is available through `GET /api/config`; run responses contain trace snapshots with deployment, attempts and latency. The browser presents business results and approval status.
+Everything in this section is a **target design**, not an implemented connector or deployed service. Today both mock and Azure providers use synthetic scenario evidence from `api/src/providers.js`; `data.js` contains illustrative dashboard content. No POS, ERP, OMS, WMS, retrieval index or retail write integration exists.
 
-| Layer | Proposed components |
-| --- | --- |
-| Experience | Operations workspace, approvals, value dashboard |
-| Agent | Process orchestrator, evidence agent, risk agent |
-| Knowledge | Foundry IQ, Microsoft Fabric, policy graph |
-| Control | Microsoft Entra ID, Agent 365, Purview |
-| Operations | Azure Monitor, evaluation pipeline, Cost Management |
+The target application boundary keeps the operations workspace responsible for review, the orchestrator responsible for workflow/policy, source applications authoritative for retail facts and transactions, and an analytics layer responsible for outcome measurement. Agents interpret bounded evidence and propose actions; they do not become systems of record or authorization services.
 
-The proposed control boundary calls for identity-bound tool calls, evidence attached to decisions, approval for material exceptions, model and workflow evaluations, and end-to-end activity audit. “Least agency” means minimum delegated authority. Proposed autonomy percentages never expand current permissions.
-
-- ADR-01: Use agent-led orchestration with human approval to reduce queue time while preserving accountability for material exceptions.
-- ADR-02: Separate evidence assembly from decision authority so automation does not silently expand agent permissions.
-- ADR-03: Ground recommendations in versioned policy for reproducibility, audit and controlled evolution.
-- ADR-04: Measure business outcomes alongside model quality to detect poor adoption or process value.
-
-These are proposed design decisions, not evidence of production acceptance.
-
-| Requirement | Proposed response | Illustrative acceptance target |
+| Proposed source / accountable domain | Evidence and integration pattern | Proposed controls and consumers |
 | --- | --- | --- |
-| R-01: Reduce cycle time | Process orchestrator and parallel evidence | Median completion ≤ 3.5 days |
-| C-02: Human accountability | Risk gate and signed approval | 100% material exceptions approved |
-| C-04: Explain decisions | Citation and policy-version capture | ≥ 98% evidence completeness |
-| R-07: Control unit economics | Model routing and token budgets | AI cost ≤ $2.50 per completed case |
+| POS and ecommerce / sales operations | Sales, returns and channel demand by SKU/location/time; approved event feed or scheduled incremental extract | Reconcile totals, deduplicate event IDs, handle late arrivals; aggregate away customer identifiers. Demand agent consumes validated summaries |
+| OMS / fulfillment | Orders, reservations, cancellations and service promises; read APIs plus order-state events | Distinguish on-hand from available-to-promise, apply source versions and freshness limits; demand/inventory agents read, allocation uses constraints |
+| WMS and ERP / supply chain | Store/DC stock, safety stock, in-transit quantities, purchase orders and transfer status; scoped read APIs or change feeds | Reconcile SKU/location/unit semantics and snapshots; inventory owner sets staleness threshold; quarantine inconsistent balances |
+| Merchandising/PIM and finance / commercial | Product hierarchy, promotion calendar, prices, margin and approved cost rates; versioned extracts or APIs | Effective dates and currency/unit validation; deterministic value service computes economics from approved rates, not model-generated amounts |
+| Supplier/transport systems / logistics | Lead times, capacity, shipment events and freight estimates; partner APIs/events | Contracted data access, source trust and freshness checks; allocation/risk evaluate feasible movements |
+| Policy repository / risk and operations | Transfer limits, approval authority, safety-stock and regional rules; curated, versioned documents and structured rules | Retrieval supplies authorized citations; deterministic rules enforce authority. Text instructions cannot grant tool permissions |
+| ERP/WMS/OMS transaction APIs / application owners | Future transfer requests and fulfillment updates through a governed adapter | Separate write scope; revalidate current state, approval and policy; target-supported idempotency, reconciliation and compensation before any real action |
 
-Proposed 90-day roadmap: days 0–30 establish baselines, curate policies, test offline evaluations and validate approval boundaries; days 31–60 pilot with one operating team, capture adoption and exception telemetry and tune controls; days 61–90 complete production review, integrate systems of record and establish value measurement.
+Use agreed contracts with SKU/location keys, units/currency, event time, source version, provenance, classification and freshness limits. Source owners certify quality; missing, stale or contradictory mandatory evidence blocks recommendation/action or routes to manual review. Treat ingestion payloads and retrieved text as untrusted data. Separate operational evidence snapshots from analytical history and audit records, with approved residency, retention/deletion and access policies. Do not copy customer-level data into prompts unless a separately reviewed use case requires it.
 
-Production actions require scoped adapters, verified evidence, versioned policies, operation-specific permissions, idempotency, reconciliation and compensation. Pilots also require sign-in, durable orchestration, tenant isolation, audit, evaluations and prompt-injection testing. Model rationale remains unverified; separate risk models do not guarantee independence. Budgets notify rather than enforce spend. No official A2A conformance testing has been performed. See [production readiness](production-readiness.md), [threat model](threat-model.md) and [cost guidance](cost-guidance.md).
+An integration layer would normalize reads and handle schema changes, retries, dead-letter processing and replay. Select existing enterprise messaging/API capabilities first; a new gateway, event bus or analytics platform needs a decision and cost justification. Index retrieval is suitable for policy explanation, not an authoritative check of current inventory. Immediately before a write, recheck reservations and stock in the owning system to prevent stale approvals from causing unsafe transfers.
+
+## Production path to Microsoft Foundry, retrieval and governed tools
+
+1. **Qualify model deployments.** Start at the existing `AzureProvider` seam with compatible Azure OpenAI deployments managed through Microsoft Foundry. The code sends `chat/completions` requests to an approved `/openai/v1/` endpoint with managed identity, JSON output and bounded completion parameters. Validate actual model/API compatibility, region/residency, quota, identity and live failure behavior in an authorized environment. Microsoft documents the v1 endpoint separately from project/agent APIs in its [model endpoint guidance](https://learn.microsoft.com/en-us/azure/ai-studio/ai-services/concepts/endpoints). Current tests use injected transport; no live Foundry validation or deployment is claimed.
+2. **Add verified grounding.** Build approved source-read adapters first. For policy documents, evaluate Azure AI Search or an existing enterprise retrieval service; ingest only curated versions with source IDs, effective dates and access metadata. Enforce caller/team authorization at retrieval time, preserve citation and policy-version evidence, and test leakage, stale content, citation accuracy and prompt injection. Search supports application-managed security filters; choose and validate the appropriate access design using [Azure AI Search security guidance](https://learn.microsoft.com/en-us/azure/search/search-security-best-practices). Retrieval and its permission checks are not implemented here.
+3. **Introduce governed tools.** Register narrowly scoped, typed operations in a server-controlled allowlist. Bind each request to user authority and a workload identity; validate arguments, data classification, current source state and approved proposal revision outside the model. Begin with reads. Writes need operation-specific permission, approval thresholds/separation of duties, durable workflow, target idempotency, reconciliation, compensation and tamper-evident outcome audit. Tool schemas or a gateway alone do not establish these controls.
+4. **Qualify managed agent services only if needed.** Assess Foundry project/Agent Service capabilities against durable orchestration, tool governance, observability, data boundaries and cost requirements. Adopting them requires a new adapter/lifecycle design and evaluations; configuring a model endpoint does not implement that platform. Keep deterministic policy, value and authorization outside model discretion. Version model/prompt/retrieval configuration and require regression/safety checks, canary observation and rollback for changes.
+
+No Foundry project API, Agent Service, retrieval, tool catalog or external transaction adapter is currently implemented. Internal `retail-task/2` messages remain an application contract, **not official A2A**. Any future interoperability claim requires implementation and validation against a selected official specification; none has been performed. Foundry IQ, Fabric, Agent 365 and Purview are optional candidates from the earlier blueprint, not runtime dependencies or committed platform choices.
+
+## Governance and operating views
+
+The current deployment view is a single Functions application, Blob state, model endpoint and monitoring boundary. The target adds durable workflow, source/read and transaction/write boundaries, authorization-aware retrieval and an audit archive only as their phase gates justify them. A service owner must define SLOs, recovery objectives, incident escalation, capacity and cost controls, model-change evaluation, deployment rollback and support handover. Production risk review must include data rights, access isolation, model error, stale evidence, duplicate external effects and incomplete execution recovery.
+
+The [decision log](decision-log.md) is the authoritative rationale/alternatives record. [Requirements traceability](requirements-traceability.md) maps stakeholder concerns to components, tests, risks and outcomes. The [delivery roadmap](delivery-roadmap.md) defines stakeholders, pilot governance, adoption, sequencing and acceptance gates, replacing the former abbreviated 90-day sketch. Proposed autonomy percentages above never expand current permissions. See [production readiness](production-readiness.md), [threat model](threat-model.md) and [cost guidance](cost-guidance.md) for controls and remaining limitations.
