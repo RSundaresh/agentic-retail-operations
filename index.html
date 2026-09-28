@@ -27,7 +27,16 @@
         <div class="header-actions"><button class="primary" id="simulate-btn"><span>▶</span> Analyze disruption</button></div>
       </header>
 
-      <details class="connection panel"><summary>Demo access</summary><label for="api-token">Azure access token (deployed demo only; kept in this page’s memory)</label><input id="api-token" type="password" autocomplete="off" placeholder="Local mock needs no credentials" /></details>
+      <details class="connection">
+        <summary>Secure demo access</summary>
+        <section class="access-card panel" aria-labelledby="access-title">
+          <h2 id="access-title">Secure demo access</h2>
+          <p>Interactive workflow actions are available only to authorized demo users.</p>
+          <label for="api-token">Temporary Entra access token</label>
+          <input id="api-token" type="password" autocomplete="off" spellcheck="false" placeholder="Paste access token" aria-describedby="access-helper" />
+          <p id="access-helper">Held in memory for this browser tab only. Never stored.</p>
+        </section>
+      </details>
       <p class="view-note">Simulated business metrics and forecasts · illustrative, not measured outcomes. Human approval creates a demo receipt only.</p>
       <section class="summary-grid" id="summary-grid"></section>
 
@@ -43,7 +52,6 @@
       </div>
       <div class="approval-actions"><button id="approve-run" disabled>Approve demo transfer</button><button id="reject-run" disabled>Reject</button><button class="ghost" id="evidence-btn">Review evidence</button></div>
       <h2 id="sim-title">Your decision dossier</h2>
-      <p>Synthetic evidence and illustrative business impact. Approval creates a demo receipt only; no real inventory is transferred.</p>
       <div class="sim-track" id="sim-track"></div>
       <div class="sim-event" id="sim-event">Analyze the disruption to prepare evidence for review.</div>
       <details class="dossier-details"><summary>Recommendation rationale &amp; accountability</summary><div id="dossier-grid" class="dossier-grid"></div></details><pre class="sim-results" id="sim-results" hidden></pre>

@@ -85,8 +85,8 @@
 .process-flow{grid-template-columns:1fr 1fr}
 .header-actions .ghost{display:none}
 .drawer{width:92vw}}
-.connection{padding:16px;margin-bottom:16px}
-.connection input{width:100%;padding:8px;margin-top:8px}
+.connection input{width:100%;padding:10px 12px;margin-top:6px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink);font:inherit;font-size:13px}
+.connection input:focus-visible,.connection summary:focus-visible{outline:2px solid var(--purple);outline-offset:3px}
 .simulation-card{max-height:90vh;overflow:auto}
 .sim-results{display:block;white-space:pre-wrap;overflow-wrap:anywhere;font-size:12px;text-align:left}
 .approval-actions{display:flex;gap:12px;margin:16px 0}
@@ -95,7 +95,7 @@
 .sidebar-footer .status{white-space:normal}button:focus-visible,summary:focus-visible,a:focus-visible{outline:3px solid var(--purple);outline-offset:3px}
 .view-note{font-size:12px;color:var(--muted);line-height:1.6}
 .connection summary{cursor:pointer;font-weight:600;font-size:13px}
-.connection label{display:block;margin-top:16px;font-size:12px}
+.connection label{display:block;margin-top:14px;font-size:12px;font-weight:600}
 .operations-guardrails{margin-top:16px;padding:18px;border:1px solid var(--line)}
 .operations-guardrails p,.operations-guardrails div{font-size:12px}#sim-track{display:block}
 
@@ -119,7 +119,7 @@ body{font-size:14px}h1,h2,h3,.metric strong,.brand strong{font-family:Inter,syst
 
 /* Keep the decision and its controls ahead of the supporting workflow. */
 main{padding:18px 24px 24px}header{margin-bottom:10px;gap:16px}.header-actions{flex-shrink:0}
-.connection{width:fit-content;max-width:100%;padding:7px 12px;margin:0 0 8px auto}.connection[open]{width:min(420px,100%)}.connection label{margin-top:8px}
+.connection{width:fit-content;max-width:100%;margin:0 0 8px auto}.connection[open]{width:min(360px,100%)}.connection summary{padding:7px 0}.access-card{margin-top:6px;padding:18px;border-radius:12px}.access-card h2{margin:0;font-size:16px}.access-card p{margin:8px 0 0;color:var(--muted);font-size:12px;line-height:1.5}.access-card #access-helper{font-size:11px}
 .view-note{margin:6px 0 10px}.metric{padding:10px 14px}.metric label{margin-bottom:4px}.metric small{margin-top:3px}
 .decision-layout{display:grid;grid-template-columns:minmax(0,2fr) minmax(260px,1fr);gap:14px;margin-bottom:14px;align-items:start}
 .decision-section,.copilot{margin:0;min-width:0}.simulation-card,.copilot{padding:16px}.simulation-card{overflow:visible}

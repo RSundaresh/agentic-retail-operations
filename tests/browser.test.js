@@ -53,6 +53,11 @@ test('token is sent only in authorization header and approval/rejection keep API
   await b.run('runSimulation()');await b.run("decideRun('reject')");
   assert.equal(b.run('calls[5].options.body'),'{"decision":"reject","revision":1}');
   assert.match(b.element('#response-status').textContent,/rejected/);
+  assert.equal(b.run('calls.length'),6);
+  assert.equal(b.run("calls.every(({url,options}) => !url.includes('secret-token') && !(options.body || '').includes('secret-token') && options.headers.Authorization === 'Bearer secret-token')"),true);
+  for (const selector of ['#sim-event','#sim-results','#sim-track','#dossier-grid','#audit-reference','#response-status','#runtime-mode']) {
+    assert.doesNotMatch(b.element(selector).textContent + b.element(selector).innerHTML,/secret-token/);
+  }
 });
 
 test('workflow distinguishes parallel investigation, independent challenge and deterministic value',()=>{
