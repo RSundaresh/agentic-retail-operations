@@ -15,7 +15,7 @@ npm test
 npm start
 ```
 
-Open **http://127.0.0.1:4173** (use that hostname exactly). Click **Run agent workflow**, inspect outputs and traces, then approve or reject. No npm installation is needed for the mock server. State and the daily quota reset when the local server restarts. The Azure token field stays empty locally.
+Open **http://127.0.0.1:4173** (use that hostname exactly). Click **Analyze disruption**, review the top recommendation summary and business impact, then approve or reject beside the proposed action. The mock result proposes a 60-unit transfer with $600 net value as the first policy-constrained action within the larger $286K disruption response (38 stores at risk of stockout). Use **Review evidence** for findings, the adjacent **Decision Copilot** for guided answers, and **Audit details** for the decision UUID, revision and expiration. After results return, the analysis button reads **Run analysis again**. The collapsed **Demo access** disclosure contains the Azure token field. The footer links to the solution architecture. No npm installation is needed for the mock server. State and the daily quota reset when the local server restarts. The Azure token field stays empty locally.
 
 `npm run build` copies public files to `dist/` and `api/public/`. The Functions package serves the frontend and API on the same origin, avoiding a paid Static Web Apps tier or a proxy. `staticwebapp.config.json` is reused as the security-header source. The old static deployment workflow is now validation-only.
 
@@ -30,7 +30,7 @@ Open **http://127.0.0.1:4173** (use that hostname exactly). Click **Run agent wo
 
 Demand and inventory run concurrently. Allocation consumes both outputs. Risk and deterministic value run concurrently. Risk rejection or a failed policy check blocks approval. Successful analysis stops in `pending`; approval expiry is 30 minutes. Approval uses an atomic revision check before execution. Duplicate/stale approvals return 409; other users cannot read or approve your runs. Failed model requests never silently use mock results.
 
-The request runs synchronously, with two attempts per model task and an eight-second timeout per attempt. Expect up to approximately 49 seconds plus storage/network overhead in the worst retry path. Trace entries include correlation/task IDs, routing, attempts, timestamps, latency and sanitized error codes. The UI displays completed traces; this is not streaming telemetry.
+The request runs synchronously, with two attempts per model task and an eight-second timeout per attempt. Expect up to approximately 49 seconds plus storage/network overhead in the worst retry path. Trace entries include correlation/task IDs, routing, attempts, timestamps, latency and sanitized error codes. Completed trace snapshots remain in API responses and persisted run records; this is not streaming telemetry.
 
 ## Azure configuration
 

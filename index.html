@@ -11,90 +11,65 @@
   <div class="shell">
     <aside class="sidebar">
       <div class="brand"><span class="brand-mark">RO</span><div><strong>Retail Operations</strong><small>Agentic Control Tower</small></div></div>
-      <nav>
-        <button class="nav-item active" data-view="studio"><span>◫</span>Transformation studio</button>
-        <button class="nav-item" data-view="portfolio"><span>⌁</span>Portfolio intelligence</button>
-        <button class="nav-item" data-view="governance"><span>◇</span>Governance center</button>
-      </nav>
       <div class="sidebar-section">
-        <p>PROCESS TWINS</p>
+        <p>OPERATIONS</p>
         <button class="scenario active" data-scenario="inventory"><span class="scenario-icon violet">IR</span><div>Inventory disruption<small>Omnichannel retail</small></div></button>
-        <button class="scenario" data-scenario="promotion"><span class="scenario-icon cyan">PE</span><div>Promotion event<small>Merchandising</small></div></button>
       </div>
       <div class="sidebar-footer">
-        <div class="status"><i></i> <span id="runtime-mode">API mode unknown · connect by running workflow</span></div>
-        <button class="avatar">SI</button><div><strong>Sundar Iyer</strong><small>Transformation Architect</small></div>
+        <div class="status"><i></i> <span id="runtime-mode">Ready to analyze a disruption</span></div>
+        <span class="avatar" aria-hidden="true">RO</span><div><strong>Regional operator</strong><small>Identity recorded on decision</small></div>
       </div>
     </aside>
 
     <main>
       <header>
         <div><span class="eyebrow">AGENTIC RETAIL OPERATIONS CONTROL TOWER</span><h1 id="page-title">Inventory disruption</h1><p id="page-subtitle">Sense demand, rebalance inventory, and govern execution across every channel.</p></div>
-        <div class="header-actions"><button class="ghost" id="evidence-btn">Evidence <span class="badge">6</span></button><button class="primary" id="simulate-btn"><span>▶</span> Run agent workflow</button></div>
+        <div class="header-actions"><button class="primary" id="simulate-btn"><span>▶</span> Analyze disruption</button></div>
       </header>
 
-      <section class="connection panel"><label for="api-token">Azure access token (deployed demo only; kept in this page’s memory)</label><input id="api-token" type="password" autocomplete="off" placeholder="Local mock needs no credentials" /><p>All dashboard forecasts and business metrics below are illustrative. Workflow results appear when you run the agents.</p></section>
+      <details class="connection panel"><summary>Demo access</summary><label for="api-token">Azure access token (deployed demo only; kept in this page’s memory)</label><input id="api-token" type="password" autocomplete="off" placeholder="Local mock needs no credentials" /></details>
+      <p class="view-note">Simulated business metrics and forecasts · illustrative, not measured outcomes. Human approval creates a demo receipt only.</p>
       <section class="summary-grid" id="summary-grid"></section>
 
+      <div class="decision-layout">
+  <div class="decision-section" id="simulation-modal" aria-hidden="false">
+    <div class="simulation-card">
+      <div class="simulation-head"><div><span class="live-dot"></span>DECISION DOSSIER</div><button id="close-simulation" hidden>Close</button></div>
+      <div class="recommendation-summary" aria-live="polite">
+        <span class="kicker">NEXT POLICY-CONSTRAINED ACTION</span>
+        <h2 id="recommendation-title">Analyze the disruption to prepare a recommendation</h2>
+        <div class="recommendation-facts"><strong id="recommendation-value">Value awaiting analysis</strong><span id="recommendation-policy">Policy check pending</span><span>Human approval required</span></div>
+        <p>This is the first policy-constrained action within the larger $286K disruption response, not a resolution of the entire exposure.</p>
+      </div>
+      <div class="approval-actions"><button id="approve-run" disabled>Approve demo transfer</button><button id="reject-run" disabled>Reject</button><button class="ghost" id="evidence-btn">Review evidence</button></div>
+      <h2 id="sim-title">Your decision dossier</h2>
+      <p>Synthetic evidence and illustrative business impact. Approval creates a demo receipt only; no real inventory is transferred.</p>
+      <div class="sim-track" id="sim-track"></div>
+      <div class="sim-event" id="sim-event">Analyze the disruption to prepare evidence for review.</div>
+      <details class="dossier-details"><summary>Recommendation rationale &amp; accountability</summary><div id="dossier-grid" class="dossier-grid"></div></details><pre class="sim-results" id="sim-results" hidden></pre>
+      <details class="audit-details"><summary>Audit details</summary><p id="audit-reference"></p><button id="refresh-run" disabled>Refresh state</button></details>
+
+    </div>
+  </div>
+<section class="panel copilot" aria-labelledby="copilot-title"><span class="kicker">GUIDED DECISION SUPPORT</span><h2 id="copilot-title">Decision Copilot</h2><p>Answers drawn from this scenario and returned results. No conversational model is used.</p><div class="question-buttons"><button data-question="why">Why this recommendation?</button><button data-question="inaction">What happens if we take no action?</button><button data-question="evidence">Which evidence influenced the decision?</button><button data-question="policy">What policy limits apply?</button></div><p id="copilot-answer" role="status">Choose a question to explore the decision.</p></section></div>
       <section class="panel process-panel">
-        <div class="panel-heading"><div><span class="kicker">CURRENT-STATE TWIN</span><h2>How work moves today</h2></div><div class="legend"><span><i class="human"></i>Human</span><span><i class="system"></i>System</span><span><i class="risk"></i>Control gap</span></div></div>
+        <div class="panel-heading"><div><span class="kicker">Response progress</span><h2>From disruption to decision</h2></div></div>
+        <p id="response-status" class="view-note" role="status">Ready to analyze. No action has been approved.</p>
         <div id="process-flow" class="process-flow"></div>
-        <div class="insight-strip"><span class="spark">✦</span><div><strong id="insight-title"></strong><p id="insight-copy"></p></div><button id="inspect-btn">Inspect evidence →</button></div>
+        <div class="insight-strip"><span class="spark">✦</span><div><strong id="insight-title"></strong><p id="insight-copy"></p></div></div>
       </section>
 
-      <section class="panel orchestration-panel">
-        <div class="panel-heading"><div><span class="kicker">MULTI-AGENT ORCHESTRATION</span><h2>Specialist collaboration</h2></div><div class="protocol-pill">Internal retail-task/2 · not official A2A</div></div>
-        <div class="orchestration-map">
-          <article class="agent-node orchestrator"><span>OR</span><div><strong>Retail Orchestrator</strong><small>Plans, delegates, reconciles</small><em>Model Router</em></div></article>
-          <div class="a2a-line"><i></i><b>TASKS</b></div>
-          <div class="agent-grid">
-            <article class="agent-node"><span>DS</span><div><strong>Demand Signal</strong><small>Detects demand shifts</small><em>Forecast models</em></div></article>
-            <article class="agent-node"><span>IN</span><div><strong>Inventory</strong><small>Builds availability graph</small><em>Fast model + tools</em></div></article>
-            <article class="agent-node"><span>AL</span><div><strong>Allocation</strong><small>Simulates rebalancing</small><em>Reasoning model</em></div></article>
-            <article class="agent-node"><span>RG</span><div><strong>Risk & Governance</strong><small>Challenges proposed actions</small><em>Independent judge</em></div></article>
-            <article class="agent-node"><span>VA</span><div><strong>Value</strong><small>Calculates economics</small><em>Deterministic tools</em></div></article>
-            <article class="agent-node"><span>EX</span><div><strong>Execution</strong><small>Coordinates approved actions</small><em>Policy-bound tools</em></div></article>
-          </div>
-          <aside class="routing-policy"><span class="kicker">DECISION GUARDRAILS</span><strong>Controlled recommendations</strong><p>Every inventory action 
-is checked against policy and requires human approval before execution.</p><div><span>Transfer limit</span><b>≤ 60 units</b></div><div><span>Human 
-approval</span><b>Required</b></div></aside>
-        </div>
-      </section>
-
-      <section class="section-heading"><div><span class="kicker">TARGET OPERATING MODELS</span><h2>Compare illustrative operating models</h2></div><div class="confidence">Illustrative comparison · API routing is server-configured</div></section>
-      <section class="models" id="models"></section>
-
-      <section class="blueprint panel" id="blueprint">
-        <div class="panel-heading"><div><span class="kicker">PROPOSED BLUEPRINT</span><h2 id="blueprint-title">Balanced operating model</h2></div><button class="ghost" id="export-btn">Export architecture package</button></div>
-        <div class="tabs" role="tablist">
-          <button class="tab active" data-tab="architecture">Architecture</button>
-          <button class="tab" data-tab="decisions">Decision log <span>4</span></button>
-          <button class="tab" data-tab="traceability">Traceability</button>
-          <button class="tab" data-tab="roadmap">90-day roadmap</button>
-        </div>
-        <div id="tab-content"></div>
-      </section>
+      <aside class="routing-policy panel operations-guardrails"><span class="kicker">DECISION GUARDRAILS</span><strong>Controlled recommendations</strong><p>Every inventory action is checked against policy and requires human approval before execution.</p><div><span>Transfer limit</span><b>≤ 60 units</b></div><div><span>Human approval</span><b>Required</b></div></aside>
+      <footer class="site-footer"><a href="https://github.com/RSundaresh/agentic-retail-operations/blob/main/docs/architecture.md" target="_blank" rel="noopener noreferrer">Solution architecture on GitHub</a></footer>
     </main>
   </div>
 
-  <div class="drawer" id="drawer" aria-hidden="true">
-    <div class="drawer-head"><div><span class="kicker">EVIDENCE & CONTROLS</span><h2>Why the twin made these decisions</h2></div><button id="close-drawer">×</button></div>
+  <div class="drawer" id="drawer" role="dialog" aria-modal="true" aria-label="Decision evidence" aria-hidden="true" inert>
+    <div class="drawer-head"><div><span class="kicker">EVIDENCE & CONTROLS</span><h2>Evidence behind the decision</h2></div><button id="close-drawer" aria-label="Close evidence">×</button></div>
     <div id="drawer-content"></div>
   </div>
   <div class="overlay" id="overlay"></div>
 
-  <div class="simulation-modal" id="simulation-modal" aria-hidden="true">
-    <div class="simulation-card">
-      <div class="simulation-head"><div><span class="live-dot"></span>AGENT WORKFLOW & HUMAN APPROVAL</div><button id="close-simulation">×</button></div>
-      <h2 id="sim-title">Resolving inventory disruption EVT-2048</h2>
-      <p>Synthetic retail evidence in both modes. Live means Azure model calls; execution creates a demo receipt only. Dashboard business metrics are illustrative.</p>
-      <div class="sim-track" id="sim-track"></div>
-      <div class="sim-event" id="sim-event"><span>Preparing simulation…</span></div>
-      <pre class="sim-results" id="sim-results"></pre>
-      <div class="approval-actions"><button id="approve-run" disabled>Approve demo transfer</button><button id="reject-run" disabled>Reject</button><button id="refresh-run" disabled>Refresh state</button></div>
-      <details><summary>Agent trace (routing, attempts, latency)</summary><pre id="live-trace"></pre></details>
-    </div>
-  </div>
   <script src="data.js"></script>
   <script src="app.js"></script>
 </body>

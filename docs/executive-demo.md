@@ -6,19 +6,19 @@ Run `npm test` and `npm start` with Node 22. Open http://127.0.0.1:4173. For an 
 
 ## 0:00 — Establish scope
 
-“This control tower demonstrates how six specialists coordinate retail decisions. Dashboard metrics and retail evidence are synthetic. The mode indicator tells us whether models are deterministic fixtures or live Azure inference. Execution only records a demo receipt.”
+“This control tower demonstrates how six specialists coordinate retail decisions. Dashboard metrics and retail evidence are synthetic. The server configuration (`GET /api/config`) identifies deterministic fixtures or live Azure inference. Execution only records a demo receipt.”
 
 ## 0:45 — Run inventory disruption
 
-Click **Run agent workflow**. Explain the dependency graph: demand and inventory analyze independently, allocation combines them, then risk and value assess the proposal in parallel. Wait for the result. Show the correlation ID and actual mode. An error is an error; do not claim a live result if a dependency failed.
+Click **Analyze disruption**. Explain the dependency graph: demand and inventory analyze independently, allocation combines them, then risk and value assess the proposal in parallel. Wait for the result. Open **Audit details** for the decision UUID, revision and expiration; confirm the actual mode from server configuration. An error is an error; do not claim a live result if a dependency failed.
 
 ## 2:00 — Inspect accountability
 
-Read the allocation quantity, risk rationale and value calculation. Expand trace. Show agent deployment names, latency and attempt numbers. “We route by task type. Value calculations and execution use code, not model discretion. Latencies are this run's measurements; business metrics elsewhere are illustrative.”
+Start with the top recommendation: **Transfer 60 units from nearby excess inventory**, **$600 net value**, **Policy check passed**, and **Human approval required** in the mock scenario. Explain that 38 stores at risk of stockout and $286K at risk describe the larger disruption; this is its first policy-constrained action. Read the rationale and value calculation in the expandable dossier, use the single **Review evidence** action, and explore the adjacent **Decision Copilot**. For technical discussion, follow **Solution architecture on GitHub** in the footer. Inspect API trace snapshots separately for agent deployment names, latency and attempt numbers. “We route by task type. Value calculations and execution use code, not model discretion. Latencies are this run's measurements; business metrics elsewhere are illustrative.”
 
 ## 3:00 — Exercise human control
 
-Point to `pending` and the absence of an execution output. Click **Reject**. Show rejected state with no receipt. Start another run, inspect its proposal, then click **Approve demo transfer**. Show approved actor/time in refreshed API data if needed, completed state and receipt with `enterpriseWrite: false`. Approval controls become disabled. “The server rejects repeated or stale approvals, and another user cannot approve my run.”
+Point to `pending` and the absence of an execution output. Click **Reject**. Show rejected state with no receipt. Click **Run analysis again**, inspect its proposal, then click **Approve demo transfer**. Show approved actor/time in refreshed API data if needed, completed state and receipt with `enterpriseWrite: false`. Approval controls become disabled. “The server rejects repeated or stale approvals, and another user cannot approve my run.”
 
 ## 4:15 — Explain cost and failure behavior
 
